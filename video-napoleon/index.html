@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>¿Por qué Napoleón no se detuvo? · History Matters</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0f0f1a;color:#eee;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px}
+  h1{font-size:clamp(20px,3vw,34px);text-align:center;margin:8px 0 2px}
+  .sub{color:#aaa;text-align:center;margin-bottom:14px;font-size:14px}
+  .stage{width:min(1100px,96vw);aspect-ratio:16/9;background:#f2e8d5;border-radius:16px;overflow:hidden;position:relative;color:#1e1e28;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+  .topbar{position:absolute;top:0;left:0;right:0;height:64px;background:#a8d8ea;display:flex;align-items:center;justify-content:space-between;padding:0 18px;z-index:5}
+  .topbar b{font-size:clamp(13px,2vw,20px)}
+  .topbar span{font-size:12px;color:#444}
+  .scene-title{position:absolute;top:74px;left:18px;right:18px;z-index:5}
+  .scene-title h2{font-size:clamp(16px,2.4vw,26px)}
+  .scene-title p{font-size:clamp(11px,1.6vw,15px);color:#555}
+  svg.map{position:absolute;inset:0;width:100%;height:100%}
+  .country{stroke:#1e1e28;stroke-width:2;transition:fill .8s}
+  .clabel{font-size:13px;font-weight:700;fill:#fff;text-anchor:middle;paint-order:stroke;stroke:rgba(0,0,0,.35);stroke-width:3px}
+  .funfact{position:absolute;right:14px;top:130px;background:#fff8c9;border:2px solid #e6c200;color:#5a4a00;padding:8px 12px;border-radius:10px;font-size:13px;max-width:230px;z-index:6;box-shadow:0 6px 18px rgba(0,0,0,.2);display:none}
+  .funfact.show{display:block;animation:pop .4s}
+  @keyframes pop{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
+  .caption{position:absolute;left:50%;transform:translateX(-50%);bottom:56px;width:min(88%,760px);background:rgba(15,15,25,.92);color:#fff;text-align:center;padding:12px 18px;border-radius:12px;font-size:clamp(14px,2vw,20px);line-height:1.35;z-index:6;min-height:54px;display:flex;align-items:center;justify-content:center}
+  .progress{position:absolute;left:0;right:0;bottom:0;height:8px;background:#ccc;z-index:7}
+  .progress i{display:block;height:100%;width:0;background:#c0392b}
+  .controls{width:min(1100px,96vw);display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center;margin-top:14px}
+  button{background:#2c5aa0;color:#fff;border:0;padding:10px 18px;border-radius:999px;font-size:15px;cursor:pointer;font-weight:600}
+  button:hover{background:#1e3f70}
+  button.ghost{background:#26263a}
+  .scenes{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:10px;width:min(1100px,96vw)}
+  .scenes button{font-size:13px;padding:8px 12px;background:#26263a}
+  .scenes button.on{background:#c0392b}
+  .note{width:min(1100px,96vw);color:#999;font-size:13px;text-align:center;margin-top:10px;line-height:1.6}
+  .note a{color:#7db4ff}
+</style>
+</head>
+<body>
+<h1>¿Por qué Napoleón no se detuvo cuando iba ganando?</h1>
+<div class="sub">Documental animado estilo <b>History Matters</b> · 5 escenas · ~3:40 · Con narración</div>
+
+<div class="stage" id="stage">
+  <div class="topbar"><b id="sceneTitle">ESCENA 1 · EL IMPERIO EN SU CIMA</b><span id="sceneNum">1 / 5</span></div>
+  <div class="scene-title"><p id="sceneKick">1799 → 1812: Europa redibujada</p></div>
+  <svg class="map" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice">
+    <rect x="0" y="0" width="1280" height="720" fill="#f2e8d5"/>
+    <rect x="0" y="0" width="1280" height="110" fill="#a8d8ea"/>
+    <g id="countries"></g>
+    <g id="fx"></g>
+  </svg>
+  <div class="funfact" id="funfact"></div>
+  <div class="caption" id="caption">Pulsa ▶ Reproducir para ver el documental</div>
+  <div class="progress"><i id="bar"></i></div>
+</div>
+
+<div class="controls">
+  <button id="playBtn">▶ Reproducir</button>
+  <button id="restartBtn" class="ghost">↺ Reiniciar</button>
+  <span id="time" style="color:#aaa;font-size:14px">0:00 / 3:40</span>
+</div>
+<div class="scenes" id="sceneBtns"></div>
+<div class="note">💡 Tip: el video MP4 exportado está en <b>napoleon-video.mp4</b> (misma carpeta). Esta página es la versión interactiva con mapa animado sincronizado a la narración.</div>
+
+<audio id="audio" preload="auto"></audio>
+
+<script>
+const SCENES = [
+ {audio:"audio/escena1.mp3", title:"ESCENA 1 · EL IMPERIO EN SU CIMA", kick:"1799 → 1812: Europa redibujada",
+  subs:["En 1799, Europa era un puzzle de reyes que se odiaban.","En 1812, Napoleón había redibujado el mapa.","Prusia vasallo. Austria humillada. España e Italia bajo control francés.","Fun fact: gobernaba a más de 40 millones de personas.","Entonces... ¿por qué no se detuvo?","Porque su imperio necesitaba guerras para sobrevivir."],
+  fun:"💡 Fun fact: en su cima, Napoleón controlaba directa o indirectamente a 40+ millones de personas."},
+ {audio:"audio/escena2.mp3", title:"ESCENA 2 · EL OBSTÁCULO: GRAN BRETAÑA", kick:"El Sistema Continental y sus 3 fracasos",
+  subs:["El problema tenía nombre: Gran Bretaña.","El Canal de la Mancha era un muro de agua.","Invadir Inglaterra era cruzar el océano en bici.","Napoleón prohibió todo comercio británico.","¿Funcionó? No. Por tres razones:","1) Portugal y Rusia hacían trampa en secreto.","2) Contrabando: azúcar y café por mil puertos falsos.","3) Los británicos contra-bloquearon... con barcos."],
+  fun:"💡 Fun fact: el contrabando era tan rentable que hasta funcionarios franceses sobornaban por azúcar británico."},
+ {audio:"audio/escena3.mp3", title:"ESCENA 3 · LA PAZ QUE NO DURÓ", kick:"Amiens 1802 → Austerlitz → Wagram",
+  subs:["La Paz de Amiens (1802) duró apenas un año.","Napoleón anexaba territorios en plena paz.","Para Austria: si hoy es tu vecino, mañana eres tú.","1805: Austerlitz. Victoria perfecta.","¿Paró? No. Pidió más.","1809: Wagram. Y volvió a pedir más.","Cada victoria creaba la siguiente coalición."],
+  fun:"💡 Fun fact: Austerlitz (1805) es considerada una de las victorias más perfectas de la historia militar."},
+ {audio:"audio/escena4.mp3", title:"ESCENA 4 · POR QUÉ NO PODÍA PARAR", kick:"Personalidad · Vasallos · Miedo ideológico",
+  subs:["Tres motivos. Primero: su personalidad.","Cada tratado era un alto, no un destino.","Segundo: no tenía aliados, tenía vasallos.","Un vasallo te abandona cuando huele derrota.","Tercero: miedo ideológico.","Los reyes temían el contagio revolucionario.","Mejor derrotarlo que contagiarse."],
+  fun:"💡 Fun fact: los reyes veían a Napoleón como 'la Revolución exportada' — un virus ideológico."},
+ {audio:"audio/escena5.mp3", title:"ESCENA 5 · OFERTAS RECHAZADAS Y CAÍDA", kick:"Fráncfort 1813 · Châtillon 1814 · Waterloo 1815",
+  subs:["En 1813 le ofrecieron la paz con fronteras de 1792.","Napoleón dudó... y rechazó.","En 1814, lo mismo. Rechazó otra vez.","Creía que aún podía ganar. No podía.","Waterloo 1815. Abdicación. Santa Elena.","Perdió porque nunca supo cuándo había ganado."],
+  fun:"💡 Fun fact: Santa Elena está a ~1.950 km de África. Napoleón murió allí en 1821, exiliado."},
+];
+const MAP = [
+ ["GRAN BRETAÑA",90,130,210,90],["PORTUGAL",90,340,130,70],["ESPAÑA",240,370,180,80],
+ ["FRANCIA",300,250,200,90],["PRUSIA",540,190,170,80],["AUSTRIA",540,300,180,80],
+ ["ITALIA",420,440,150,90],["RUSIA",760,190,340,200],["POLONIA",560,420,170,70],
+];
+const COLORS = {BLUE:"#2c5aa0",RED:"#c0392b",GRAY:"#969696",GREEN:"#27ae60",YELLOW:"#e67e22"};
+const g = document.getElementById("countries");
+MAP.forEach(([name,x,y,w,h])=>{
+  const r=document.createElementNS("http://www.w3.org/2000/svg","rect");
+  r.setAttribute("x",x);r.setAttribute("y",y);r.setAttribute("width",w);r.setAttribute("height",h);
+  r.setAttribute("rx",12);r.setAttribute("class","country");r.dataset.name=name;r.setAttribute("fill",COLORS.GRAY);
+  g.appendChild(r);
+  const t=document.createElementNS("http://www.w3.org/2000/svg","text");
+  t.setAttribute("x",x+w/2);t.setAttribute("y",y+h/2+5);t.setAttribute("class","clabel");t.textContent=name;
+  g.appendChild(t);
+});
+const fx=document.getElementById("fx");
+function setColors(sceneIdx, frac){
+  document.querySelectorAll(".country").forEach(el=>{
+    const n=el.dataset.name; let c=COLORS.GRAY;
+    if(n==="GRAN BRETAÑA") c=COLORS.RED;
+    else if(n==="FRANCIA") c=COLORS.BLUE;
+    else if(n==="RUSIA") c = sceneIdx<4?COLORS.GREEN:COLORS.RED;
+    else if(sceneIdx===0) c = frac>0.15?COLORS.BLUE:COLORS.GRAY;
+    else if(sceneIdx===4) c = (frac<0.5)?COLORS.GRAY:COLORS.RED;
+    else if(["ITALIA","ESPAÑA"].includes(n)) c=COLORS.BLUE;
+    el.setAttribute("fill",c);
+  });
+  fx.innerHTML="";
+  if(sceneIdx===1){
+    for(let k=0;k<3;k++){
+      const bx=120+((frac*500+k*140)%500), by=260+Math.sin(frac*10+k)*15;
+      fx.innerHTML+=`<g><polygon points="${bx},${by} ${bx+40},${by} ${bx+28},${by+16} ${bx+12},${by+16}" fill="#1e1e28"/><rect x="${bx+14}" y="${by-12}" width="12" height="12" fill="#1e1e28"/></g>`;
+    }
+    fx.innerHTML+=`<text x="640" y="600" text-anchor="middle" font-size="16" fill="#1e1e28">🚢 ROYAL NAVY: el muro de agua</text>`;
+  }
+  if(sceneIdx===2){
+    fx.innerHTML+=`<circle cx="640" cy="340" r="90" fill="none" stroke="#c0392b" stroke-width="6"/><text x="640" y="600" text-anchor="middle" font-size="16" fill="#1e1e28">GANAR → ANEXAR → PROVOCAR → GANAR OTRA VEZ</text>`;
+  }
+  if(sceneIdx===4 && frac>0.7){
+    fx.innerHTML+=`<circle cx="1100" cy="560" r="20" fill="#c0392b" stroke="#1e1e28" stroke-width="3"/><text x="1100" y="600" text-anchor="middle" font-size="14" fill="#1e1e28">SANTA ELENA</text>`;
+  }
+}
+const audio=document.getElementById("audio"), cap=document.getElementById("caption"),
+      bar=document.getElementById("bar"), timeEl=document.getElementById("time"),
+      playBtn=document.getElementById("playBtn"), funEl=document.getElementById("funfact");
+let cur=-1, total=0, offsets=[];
+function fmt(s){return Math.floor(s/60)+":"+String(Math.floor(s%60)).padStart(2,"0")}
+function loadScene(i){
+  cur=i; const sc=SCENES[i];
+  document.getElementById("sceneTitle").textContent=sc.title;
+  document.getElementById("sceneKick").textContent=sc.kick;
+  document.getElementById("sceneNum").textContent=(i+1)+" / 5";
+  document.querySelectorAll("#sceneBtns button").forEach((b,j)=>b.classList.toggle("on",j===i));
+  audio.src=sc.audio; audio.load(); audio.play().catch(()=>{});
+  playBtn.textContent="⏸ Pausar";
+  funEl.textContent=sc.fun; funEl.classList.add("show");
+  setTimeout(()=>funEl.classList.remove("show"), 6000);
+}
+audio.addEventListener("loadedmetadata",()=>{
+  offsets[cur]=audio.duration; total=SCENES.reduce((a,s,i)=>a+(offsets[i]||0),0);
+  timeEl.textContent="0:00 / "+fmt(total||220);
+});
+audio.addEventListener("timeupdate",()=>{
+  const sc=SCENES[cur]; if(!sc) return;
+  const frac=audio.currentTime/audio.duration;
+  setColors(cur,frac);
+  const idx=Math.min(sc.subs.length-1, Math.floor(frac*sc.subs.length));
+  cap.textContent=sc.subs[idx];
+  // progreso global
+  const before=SCENES.slice(0,cur).reduce((a,s,i)=>a+(offsets[i]||0),0);
+  bar.style.width=((before+audio.currentTime)/(total||220)*100)+"%";
+  timeEl.textContent=fmt(before+audio.currentTime)+" / "+fmt(total||220);
+});
+audio.addEventListener("ended",()=>{ if(cur<SCENES.length-1) loadScene(cur+1); else {playBtn.textContent="▶ Reproducir"; cap.textContent="Fin. Napoleón perdió porque nunca supo cuándo había ganado. ↺ para verlo de nuevo.";} });
+playBtn.onclick=()=>{
+  if(cur<0){loadScene(0);return;}
+  if(audio.paused){audio.play();playBtn.textContent="⏸ Pausar";}
+  else{audio.pause();playBtn.textContent="▶ Reproducir";}
+};
+document.getElementById("restartBtn").onclick=()=>loadScene(0);
+const sb=document.getElementById("sceneBtns");
+SCENES.forEach((s,i)=>{const b=document.createElement("button");b.textContent=(i+1)+". "+s.title.split("·")[1].trim();b.onclick=()=>loadScene(i);sb.appendChild(b);});
+setColors(0,0);
+</script>
+</body>
+</html>
