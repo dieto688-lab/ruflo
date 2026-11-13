@@ -1,0 +1,5 @@
+file '/home/user/ruflo/video-napoleon/audio/escena1.mp3'
+file '/home/user/ruflo/video-napoleon/audio/escena2.mp3'
+file '/home/user/ruflo/video-napoleon/audio/escena3.mp3'
+file '/home/user/ruflo/video-napoleon/audio/escena4.mp3'
+file '/home/user/ruflo/video-napoleon/audio/escena5.mp3'
